@@ -166,6 +166,7 @@
       };
     };
 
+    # TODO: move to a normal user service under starptr
     systemd.services.fleeting = {
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
