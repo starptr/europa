@@ -104,11 +104,13 @@
     #services.dbus = {
     #  enable = true;
     #};
-    #services.openssh = {
-    #  settings = {
-    #    UsePAM = true;
-    #  };
-    #};
+    services.openssh = {
+      enable = true;
+      settings = {
+        PasswordAuthentication = true;
+        UsePAM = true;
+      };
+    };
 
     # Serverreff-specific config
     services.nginx = {
