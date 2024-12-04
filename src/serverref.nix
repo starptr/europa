@@ -1,6 +1,23 @@
 { config, modulesPath, lib, pkgs, ... }:
   let
     generated-serverref-data-from-pulumi = builtins.fromJSON (builtins.readFile ./../generated-serverref.json);
+    hostKeys-by-name = {
+      # INFO: deploy-rs cannot confirm activation if the first two attrsets are not in the following order by key!
+      "00_ssh_host_rsa" = {
+        bits = 4096;
+        path = "/etc/ssh/ssh_host_rsa_key";
+        type = "rsa";
+      };
+      "01_ssh_host_ed25519" = {
+        path = "/etc/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      };
+      "10_key_for_radicle" = {
+        path = "/etc/ssh/key_for_radicle";
+        type = "ed25519";
+        comment = "radicle";
+      };
+    };
   in
   {
     imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
@@ -110,6 +127,7 @@
         PasswordAuthentication = true;
         UsePAM = true;
       };
+      hostKeys = builtins.attrValues hostKeys-by-name;
     };
 
     services.radicle = {
@@ -122,6 +140,8 @@
           forceSSL = true;
         };
       };
+      publicKey = hostKeys-by-name."10_key_for_radicle".path + ".pub";
+      privateKeyFile = hostKeys-by-name."10_key_for_radicle".path;
       settings = {
         node.seedingPolicy.default = "block";
       };
