@@ -8,6 +8,8 @@
       inputs.utils.follows = "flake-utils";
     };
 
+    sops-nix.url = "github:Mic92/sops-nix";
+
     nixpkgs.url = "github:cachix/devenv-nixpkgs/rolling";
     systems.url = "github:nix-systems/default";
     devenv.url = "github:cachix/devenv";

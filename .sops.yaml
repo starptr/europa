@@ -1,0 +1,16 @@
+# This example uses YAML anchors which allows reuse of multiple keys 
+# without having to repeat yourself.
+# Also see https://github.com/Mic92/dotfiles/blob/master/nixos/.sops.yaml
+# for a more complex example.
+keys:
+  - &starptr_sodium age1k02u4z06c0qwen95uwk4qphns3qqujtmz57sr3ea34f2rwh5kvjsfkjrfy # An age key on Sodium
+  - &starptr_1p age1n04cxyhrgcp6dj42ywqgcdyntjgantwgw7afarppza24p20fdadswuw60h # main on 1P converted to age
+  - &tilderef age1n8lz243js77lvrscpwxh5lh5ha3nacdrvlxzf8f9v00jugvg3d2qkq4cnk # root@andref-579595d ed25519 converted to age
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+    - pgp:
+      age:
+      - *starptr_sodium
+      - *starptr_1p
+      - *tilderef
