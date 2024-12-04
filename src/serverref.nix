@@ -112,6 +112,21 @@
       };
     };
 
+    services.radicle = {
+      enable = true;
+      httpd = {
+        enable = true;
+        nginx = {
+          serverName = "radicle.andref.app";
+          enableACME = true;
+          forceSSL = true;
+        };
+      };
+      settings = {
+        node.seedingPolicy.default = "block";
+      };
+    };
+
     # Serverreff-specific config
     services.nginx = {
       enable = true;
