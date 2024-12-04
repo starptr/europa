@@ -28,6 +28,7 @@
       nixpkgs,
       devenv,
       systems,
+      sops-nix,
     }@inputs:
     let
       generated-serverref-data-from-pulumi = builtins.fromJSON (builtins.readFile ./generated-serverref.json);
