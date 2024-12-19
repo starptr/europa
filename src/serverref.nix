@@ -116,6 +116,14 @@
       enable = true;
       allowedTCPPorts = [ 22 80 443 ];
       allowedUDPPorts = [ 443 ];
+
+      # Through the /rp slug in nginx, expose ports 30001-30999
+      allowedTCPPortRanges = [
+        { from = 30001; to = 30999; }
+      ];
+      allowedUDPPortRanges = [
+        { from = 30001; to = 30999; }
+      ];
     };
 
     #services.dbus = {
@@ -181,6 +189,23 @@
           extraConfig = ''
             autoindex on;
           '';
+        };
+        locations."~ ^/disable-tildepage-index/~(.+?)(/.*)?$" = {
+          alias = "/home/$1/public_html$2";
+          index = "effectively-disable-index-ah5nnGv3BFj4sAJx.html";
+          extraConfig = ''
+            autoindex on;
+          '';
+        };
+
+        #location ~ ^/status-coffee {
+	      #	root /home/starptr/status-ref/build_html;
+	      #	try_files /status.html =404;
+	      #	autoindex on;
+	      #}
+
+        locations."~ ^/rp/(30[0-9][0-9][1-9])/(.*)$" = {
+          proxyPass = "http://127.0.0.1:$1/$2";
         };
       };
     };
