@@ -117,12 +117,12 @@
       allowedTCPPorts = [ 22 80 443 ];
       allowedUDPPorts = [ 443 ];
 
-      # Through the /rp slug in nginx, expose ports 30001-30999
+      # Through the /rp slug in nginx, expose ports 30000-30999
       allowedTCPPortRanges = [
-        { from = 30001; to = 30999; }
+        { from = 30000; to = 30999; }
       ];
       allowedUDPPortRanges = [
-        { from = 30001; to = 30999; }
+        { from = 30000; to = 30999; }
       ];
     };
 
@@ -204,7 +204,7 @@
 	      #	autoindex on;
 	      #}
 
-        locations."~ ^/rp/(30[0-9][0-9][1-9])/(.*)$" = {
+        locations."~ ^/rp/(30[0-9][0-9][0-9])/(.*)$" = {
           proxyPass = "http://127.0.0.1:$1/$2";
         };
       };
@@ -227,6 +227,8 @@
         };
       };
     };
+
+    services.cursor-server.enable = true;
 
     # TODO: move to a normal user service under starptr
     systemd.services.fleeting = {

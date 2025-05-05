@@ -14,6 +14,11 @@
     systems.url = "github:nix-systems/default";
     devenv.url = "github:cachix/devenv";
     devenv.inputs.nixpkgs.follows = "nixpkgs";
+
+    cursor-server = {
+      url = "github:strickczq/nixos-cursor-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   nixConfig = {
     extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
@@ -29,6 +34,7 @@
       devenv,
       systems,
       sops-nix,
+      cursor-server,
     }@inputs:
     let
       generated-serverref-data-from-pulumi = builtins.fromJSON (builtins.readFile ./generated-serverref.json);
@@ -68,7 +74,10 @@
       # deploy-rs
       nixosConfigurations.serverref = nixpkgs-tilderef.lib.nixosSystem {
         system = "x86_64-linux";
-        modules = [ ./src/serverref.nix ];
+        modules = [ 
+          cursor-server.nixosModules.default
+          ./src/serverref.nix
+        ];
       };
       deploy.nodes.serverref = {
         hostname = generated-serverref-data-from-pulumi.ipAddress;
