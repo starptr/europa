@@ -183,30 +183,45 @@
         enableACME = true;
         forceSSL = true;
         root = ../build/andref-homepages/tilde;
-        locations."~ ^/~(.+?)(/.*)?$" = {
-          alias = "/home/$1/public_html$2";
-          index = "index.html index.htm";
-          extraConfig = ''
-            autoindex on;
-          '';
-        };
-        locations."~ ^/disable-tildepage-index/~(.+?)(/.*)?$" = {
-          alias = "/home/$1/public_html$2";
-          index = "effectively-disable-index-ah5nnGv3BFj4sAJx.html";
-          extraConfig = ''
-            autoindex on;
-          '';
-        };
+        locations = {
+          "~ ^/~(.+?)(/.*)?$" = {
+            alias = "/home/$1/public_html$2";
+            index = "index.html index.htm";
+            extraConfig = ''
+              autoindex on;
+            '';
+          };
+          "~ ^/disable-tildepage-index/~(.+?)(/.*)?$" = {
+            alias = "/home/$1/public_html$2";
+            index = "effectively-disable-index-ah5nnGv3BFj4sAJx.html";
+            extraConfig = ''
+              autoindex on;
+            '';
+          };
 
-        #location ~ ^/status-coffee {
-	      #	root /home/starptr/status-ref/build_html;
-	      #	try_files /status.html =404;
-	      #	autoindex on;
-	      #}
+          #location ~ ^/status-coffee {
+	        #	root /home/starptr/status-ref/build_html;
+	        #	try_files /status.html =404;
+	        #	autoindex on;
+	        #}
 
-        locations."~ ^/rp/(30[0-9][0-9][0-9])/(.*)$" = {
-          proxyPass = "http://127.0.0.1:$1/$2";
-        };
+        }
+        // 
+        # We want the following, but nginx doesn't support $1 in the port for a proxy_pass
+        #"~ ^/rp/(30[0-9][0-9][0-9])/(.*)$" = {
+        #  proxyPass = "http://127.0.0.1:$1/$2";
+        #};
+        # So we inline every port betwen 30000 and 30999 literally like:
+        #"~ ^/rp/30000/(.*)$" = {
+        #  proxyPass = "http://127.0.0.1:30000/$1";
+        #};
+        # and generating this chunk for each port.
+        (builtins.listToAttrs (map (port: {
+          name = "~ ^/rp/${toString port}/(.*)$";
+          value = {
+            proxyPass = "http://127.0.0.1:${toString port}/$1";
+          };
+        }) (builtins.genList (i: i + 30000) 1000))); # This generates the list 30000 to 30999, inclusive
       };
     };
     systemd.services.nginx.serviceConfig.ProtectHome = false;
